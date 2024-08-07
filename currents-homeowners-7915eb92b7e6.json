@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "currents-homeowners",
+  "private_key_id": "7915eb92b7e6a003f73bb495b29c9991b04a8283",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCvaqKPLuK3tfli\nZs1iE8rYnzyXLtS0VtdDcE3WSZNRitlbls8ZrZWlVT2yfQx1w+Jtu0xcKZ/tkZfO\nRtnwKDct0hnEy/nNLktSxfpmzPi/cmAK341QJbdgt4ALefLFhTKngcBb5Uuda/6N\nnyZdMMNUmeq7wvvWNx32786Zn6gUZwv/Xw/53bx7ZQi4KblvWqV3hZUhbkrXYC/2\narYcgOga7yI4DSgbUYLFzAUr+ZHFTEyX4k3PTkUxPSiHP8/Ef+ORsMnGPKDIfdDo\npGvDDe9irMsY2XIXoNKolQv/wXnkwuuTKM7K0ngfsWTGafwcqKp5akfzqJI3RHsY\ndxkGTnVhAgMBAAECggEAH32AIz4ieyJS26Ri2Gl/L7YeVXGVw64XRMcDYiWhKbFI\nZdXD5fMwexa7VbB3LSj2HAbUpXLff/F0FBbKBv/hL/uYnqiTdo8J/JkH466GNTAe\nJ7WME8hBjD5E4UqKF4Va25FCa/zUvzTk5J2ecHpRhn1/Eyfkt8b7PRo9t3xe2xJ7\n31brCJop8fozKjYGvGC8SodU5kgRetuV3hHEnd4Pi5GbvI8GGy4yvBL29xPQCIlw\nMa1nTtI0BInAal8dP1mIo8dumcijoJNyaZ51YKpy5NLV1CkKie/RZq+Yrw0P3kCc\nJh7QjJ+p25RqJKESHVe/r36EwWEUBvNmmpCb6vIWcQKBgQDypIhI5oS626URXupa\nmBiVodqRDdP/qVunI3RuEkuPy96b+jui2ybCqxJVbeIuwdFjdYNussAtTxzTyr6J\n81tspAgoS6q9vaBhJFnNZ2EETj4Rz34GSxKg1J6klVFn/4/FYYkXZojFYYCpRbD8\nRkBO8CGKExF6LhSCCcbWw9PjhQKBgQC5ErX/8Yd4/kqi2QPQ5SbvXSD8g0BNP56k\nEw0zcQzzTzw7hBAsW9wzW7o1NtFRpFZnd5bhdOi5lV0r5COg2TK9Ls4SDrmLoUlX\njAvMko58g5uDJizGfjEfQZYyhrV2asregJb57DFcVLHQyFmiHE1PWH64s2ZBv4W2\n/xUU5qHLLQKBgQDjOOjXO+f4BFBkH/petCfxmAxR4h0xQauurSkPGtrf4g6pCoBm\nVcvKaOFWVvyExMQM27MlKweEZp2cSDR+gwKOjl2FPra50KYr0hq2m6Tin1LI4wIl\napAbRID7p0kAlvZP5LK40zAphtExsy22USNPyNffsVOgkx5pWDZ4UBJQ8QKBgEyo\nrW5okx7Q5gVyMpxybqAzSRiPHTFiKsn3gj5Ok3is11wnpbNaEWnMkuK75BQXKBsP\ndBXLISLN9Zvakc9saBHosz7TjpOBqSl0Pubrxc1Zji7SvzUwzBQQTLB9D+kO7x0e\n0mqPJRsDkevTMR1u767wDv1egfq15CMaoZbYuSe5AoGAWBIvXWV8455I3JE3CLVj\npbqdYdSksi7Ywn5f/jG1XrMp3u7AkP8sjnHEukgM7a8CKGahXPVLajdW5tO3mk4s\ndWV7YcT3BPjifE9xEh2p+0lNB2RuKGEd2M9DjNVokCKZOCiqnwMAEpKoPp0mNF8X\niMX3zJJmu748Dn/D4mMSmMk=\n-----END PRIVATE KEY-----\n",
+  "client_email": "solar-quoting-tool@currents-homeowners.iam.gserviceaccount.com",
+  "client_id": "104817279153395456844",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/solar-quoting-tool%40currents-homeowners.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
