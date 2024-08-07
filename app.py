@@ -9,9 +9,14 @@ from PyPDF2 import PdfReader
 import re
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # This loads the variables from .env
+
+api_key = os.getenv('OPENAI_API_KEY')
 
 # Replace with your OpenAI API key
-api_key = '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'
 client = OpenAI(api_key=api_key)
 
 MAX_TOKENS = 128000
