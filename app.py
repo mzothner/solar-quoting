@@ -1,5 +1,6 @@
 import streamlit as st
-import openai
+import sys
+import traceback
 from openai import OpenAI
 import pandas as pd
 from PIL import Image
@@ -10,48 +11,21 @@ import re
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 import json
-import os
-from dotenv import load_dotenv
 
-# Load environment variables (for local development without secrets.toml)
-load_dotenv()
+# Constants
+MAX_TOKENS = 128000
 
 # OpenAI setup
-api_key = st.secrets["openai"]["api_key"] if "openai" in st.secrets else os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=api_key)
-
-MAX_TOKENS = 128000
+client = OpenAI(api_key=st.secrets["openai"]["api_key"])
 
 # Google Sheets setup
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+credentials_dict = json.loads(st.secrets["google_sheets"]["credentials"])
+SPREADSHEET_ID = st.secrets["google_sheets"]["spreadsheet_id"]
+RANGE_NAME = st.secrets["google_sheets"]["range_name"]
 
-if 'google_sheets' in st.secrets:
-    # Remove any whitespace and newline characters from the credentials string
-    credentials_str = ''.join(st.secrets["google_sheets"]["credentials"].split())
-    try:
-        credentials_dict = json.loads(credentials_str)
-    except json.JSONDecodeError:
-        st.error("Error decoding Google Sheets credentials. Please check your secrets.toml file.")
-        credentials_dict = None
-    SPREADSHEET_ID = st.secrets["google_sheets"]["spreadsheet_id"]
-    RANGE_NAME = st.secrets["google_sheets"]["range_name"]
-else:
-    # Fallback to environment variables
-    credentials_str = os.getenv('GOOGLE_SHEETS_CREDENTIALS', '{}')
-    try:
-        credentials_dict = json.loads(credentials_str)
-    except json.JSONDecodeError:
-        st.error("Error decoding Google Sheets credentials from environment variable.")
-        credentials_dict = None
-    SPREADSHEET_ID = os.getenv('GOOGLE_SHEETS_SPREADSHEET_ID')
-    RANGE_NAME = os.getenv('GOOGLE_SHEETS_RANGE_NAME')
-
-if credentials_dict:
-    creds = Credentials.from_service_account_info(credentials_dict, scopes=SCOPES)
-    sheets_service = build('sheets', 'v4', credentials=creds)
-else:
-    st.warning("Google Sheets integration is not available due to credential issues.")
-    sheets_service = None
+creds = Credentials.from_service_account_info(credentials_dict, scopes=SCOPES)
+sheets_service = build('sheets', 'v4', credentials=creds)
 
 def extract_text_with_openai(file):
     pdf_reader = PdfReader(file)
@@ -191,7 +165,7 @@ def add_to_google_sheet(data):
             valueInputOption='USER_ENTERED', body=body).execute()
         return True
     except Exception as e:
-        print(f"Error adding data to Google Sheet: {str(e)}")  # Log the error server-side
+        st.error(f"Error adding data to Google Sheet: {str(e)}")
         return False
 
 def create_solar_terms_glossary():
@@ -241,9 +215,9 @@ def main():
                             st.markdown(analysis_part)
                             
                             if add_to_google_sheet(df_full.iloc[0].to_dict()):
-                                print("Data added to Google Sheet successfully!")
+                                st.success("Data added to Google Sheet successfully!")
                             else:
-                                print("Failed to add data to Google Sheet.")
+                                st.warning("Failed to add data to Google Sheet.")
                             
                             with st.expander(f"View Raw Extracted Data for Quote {i+1}"):
                                 st.text("\n".join([f"{k}: {v}" for k, v in df_display.iloc[0].items()]))
@@ -282,4 +256,9 @@ def main():
     )
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {str(e)}")
+        st.error("Full traceback:")
+        st.code(traceback.format_exc())
