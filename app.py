@@ -258,7 +258,7 @@ def main():
         }
         </style>
         <div class="footer">
-            <p><a href="https://www.currents.com?utm_source=solar-quote" target="_blank">Powered by Currents</a></p>
+            <p><a href="https://www.getcurrents.com?utm_source=solar-quote" target="_blank">Powered by Currents</a></p>
         </div>
         """,
         unsafe_allow_html=True
