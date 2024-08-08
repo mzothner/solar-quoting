@@ -9,26 +9,49 @@ from PyPDF2 import PdfReader
 import re
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
-from dotenv import load_dotenv
+import json
 import os
+from dotenv import load_dotenv
 
-load_dotenv()  # This loads the variables from .env
+# Load environment variables (for local development without secrets.toml)
+load_dotenv()
 
-api_key = os.getenv('OPENAI_API_KEY')
-
-# Replace with your OpenAI API key
+# OpenAI setup
+api_key = st.secrets["openai"]["api_key"] if "openai" in st.secrets else os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 
 MAX_TOKENS = 128000
 
 # Google Sheets setup
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = 'currents-homeowners-7915eb92b7e6.json'  # Replace with your file path
-SPREADSHEET_ID = '1nHDyBUlBW1xon-x8b4JMq8rB4ujiyN6OnGac2EtyCZU'  # Replace with your Google Sheet ID
-RANGE_NAME = 'Sheet1!A2:Z2'  # Adjust as needed
 
-creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-sheets_service = build('sheets', 'v4', credentials=creds)
+if 'google_sheets' in st.secrets:
+    # Remove any whitespace and newline characters from the credentials string
+    credentials_str = ''.join(st.secrets["google_sheets"]["credentials"].split())
+    try:
+        credentials_dict = json.loads(credentials_str)
+    except json.JSONDecodeError:
+        st.error("Error decoding Google Sheets credentials. Please check your secrets.toml file.")
+        credentials_dict = None
+    SPREADSHEET_ID = st.secrets["google_sheets"]["spreadsheet_id"]
+    RANGE_NAME = st.secrets["google_sheets"]["range_name"]
+else:
+    # Fallback to environment variables
+    credentials_str = os.getenv('GOOGLE_SHEETS_CREDENTIALS', '{}')
+    try:
+        credentials_dict = json.loads(credentials_str)
+    except json.JSONDecodeError:
+        st.error("Error decoding Google Sheets credentials from environment variable.")
+        credentials_dict = None
+    SPREADSHEET_ID = os.getenv('GOOGLE_SHEETS_SPREADSHEET_ID')
+    RANGE_NAME = os.getenv('GOOGLE_SHEETS_RANGE_NAME')
+
+if credentials_dict:
+    creds = Credentials.from_service_account_info(credentials_dict, scopes=SCOPES)
+    sheets_service = build('sheets', 'v4', credentials=creds)
+else:
+    st.warning("Google Sheets integration is not available due to credential issues.")
+    sheets_service = None
 
 def extract_text_with_openai(file):
     pdf_reader = PdfReader(file)
@@ -37,7 +60,6 @@ def extract_text_with_openai(file):
     for page in pdf_reader.pages:
         page_content = page.extract_text()
         
-        # Convert the page content to base64 and truncate to fit within the token limit
         page_content_base64 = base64.b64encode(page_content.encode('utf-8')).decode('utf-8')
         truncated_content = truncate_content(page_content_base64, MAX_TOKENS)
         prompt = f"Extract the text from the following file content (base64-encoded): {truncated_content}"
@@ -57,7 +79,7 @@ def extract_text_with_openai(file):
 def truncate_content(content, max_tokens):
     estimated_token_length = len(content) // 4
     if estimated_token_length > max_tokens:
-        return content[:max_tokens * 4]  # Truncate to fit within token limit
+        return content[:max_tokens * 4]
     return content
 
 def parse_text_with_gpt(text):
@@ -123,12 +145,10 @@ def parse_text_with_gpt(text):
     return response.choices[0].message.content
 
 def process_gpt_output(output):
-    # Split the output into data and analysis parts
     parts = output.split("\n\nAnalysis:", 1)
     data_part = parts[0]
     analysis_part = parts[1] if len(parts) > 1 else ""
 
-    # Process the data part
     data_lines = data_part.split('\n')
     data_dict = {}
     display_dict = {}
@@ -141,7 +161,6 @@ def process_gpt_output(output):
             if key not in ['Customer Email', 'Customer Phone Number']:
                 display_dict[key] = value
 
-    # Create DataFrames
     df_full = pd.DataFrame([data_dict])
     df_display = pd.DataFrame([display_dict])
 
@@ -194,7 +213,6 @@ def main():
     st.title("Solar Quote Comparison Tool")
     st.subheader("Upload your solar quotes to compare prices per watt, system sizes, incentives available and more.")
 
-    # Add info box about cost per watt
     st.info("💡 Cost per Watt is a common metric used to compare solar quotes. It's calculated by dividing the total system cost by the system size in watts. Lower cost per watt generally indicates better value, but other factors should also be considered.")
     st.divider()
 
@@ -217,19 +235,16 @@ def main():
                             
                             st.subheader(f"Quote {i+1}: {uploaded_file.name}")
                             
-                            # Display DataFrame with better formatting (excluding customer info)
                             st.dataframe(df_display.T.style.set_properties(**{'text-align': 'left'}))
                             
                             st.subheader(f"Analysis of Quote {i+1}")
                             st.markdown(analysis_part)
                             
-                            # Add data to Google Sheet (including customer info)
                             if add_to_google_sheet(df_full.iloc[0].to_dict()):
-                                print("Data added to Google Sheet successfully!")  # Log success server-side
+                                print("Data added to Google Sheet successfully!")
                             else:
-                                print("Failed to add data to Google Sheet.")  # Log failure server-side
+                                print("Failed to add data to Google Sheet.")
                             
-                            # Display raw output for debugging (excluding customer info)
                             with st.expander(f"View Raw Extracted Data for Quote {i+1}"):
                                 st.text("\n".join([f"{k}: {v}" for k, v in df_display.iloc[0].items()]))
                             
@@ -238,15 +253,12 @@ def main():
                         
                     st.divider()
             
-            # Show confetti after processing all files
             st.balloons()
 
-            # Add solar terms glossary
             st.subheader("Solar Terms Glossary")
             with st.expander("Click here to view definitions of key solar terms"):
                 st.dataframe(create_solar_terms_glossary())
 
-    # Add footer with Currents logo and link to website
     st.markdown(
         """
         <style>

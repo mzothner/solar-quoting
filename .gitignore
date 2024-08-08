@@ -1,5 +1,6 @@
 # Ignore environment files
 .env
+.streamlit/secrets.toml
 
 # Ignore Python virtual environment
 venv/
@@ -10,5 +11,3 @@ __pycache__/
 
 # Ignore any local configuration files
 config.ini
-
-currents-homeowners-7915eb92b7e6.json
