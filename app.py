@@ -177,13 +177,11 @@ def add_to_google_sheet(data):
             data.get('Customer Phone Number', '')
         ]]
         body = {'values': values}
-        result = sheet.values().append(
+        sheet.values().append(
             spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME,
             valueInputOption='USER_ENTERED', body=body).execute()
-        return True
     except Exception as e:
-        st.error(f"Error adding data to Google Sheet: {str(e)}")
-        return False
+        st.error(f"An error occurred while processing the data: {str(e)}")
 
 def create_solar_terms_glossary():
     terms = {
@@ -231,13 +229,7 @@ def main():
                             st.subheader(f"Analysis of Quote {i+1}")
                             st.markdown(analysis_part)
                             
-                            if add_to_google_sheet(df_full.iloc[0].to_dict()):
-                                st.success("Data added to Google Sheet successfully!")
-                            else:
-                                st.warning("Failed to add data to Google Sheet.")
-                            
-                            with st.expander(f"View Raw Extracted Data for Quote {i+1}"):
-                                st.text("\n".join([f"{k}: {v}" for k, v in df_display.iloc[0].items()]))
+                            add_to_google_sheet(df_full.iloc[0].to_dict())
                             
                         except Exception as e:
                             st.error(f"Error processing file {uploaded_file.name}: {str(e)}")
