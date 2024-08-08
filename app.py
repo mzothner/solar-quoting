@@ -15,6 +15,23 @@ import json
 # Constants
 MAX_TOKENS = 128000
 
+def check_secrets():
+    missing_secrets = []
+    if "openai" not in st.secrets or "api_key" not in st.secrets["openai"]:
+        missing_secrets.append("OpenAI API key")
+    if "google_sheets" not in st.secrets:
+        missing_secrets.append("Google Sheets credentials")
+    elif any(key not in st.secrets["google_sheets"] for key in ["credentials", "spreadsheet_id", "range_name"]):
+        missing_secrets.append("Complete Google Sheets configuration")
+    
+    if missing_secrets:
+        st.error(f"Missing secrets: {', '.join(missing_secrets)}")
+        st.info("Please add the missing secrets to your secrets.toml file or Streamlit Cloud app settings.")
+        st.stop()
+
+# Check secrets before proceeding
+check_secrets()
+
 # OpenAI setup
 client = OpenAI(api_key=st.secrets["openai"]["api_key"])
 
